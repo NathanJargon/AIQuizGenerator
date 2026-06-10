@@ -27,7 +27,7 @@ System Architecture
 
 4. AI Generation
    - Groq API is called from a Laravel service class
-   - Model: llama3-70b-8192
+   - Model: llama-3.3-70b-versatile
    - API key is stored only in the .env file
 
 5. Database

@@ -3,40 +3,49 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AI Quiz Generator Dashboard</title>
+    <title>AI Quiz Generator</title>
     <style>
         :root {
             color-scheme: dark;
-            --panel: rgba(10, 19, 34, 0.86);
-            --border: rgba(148, 163, 184, 0.14);
-            --text: #e5eefc;
-            --muted: #9fb2d0;
-            --accent: #4fd1c5;
-            --accent-strong: #2dd4bf;
-            --success: #34d399;
-            --danger: #fb7185;
-            --shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
+
+            --bg: #05070d;
+            --panel: rgba(255, 255, 255, 0.03);
+            --panel-hover: rgba(255, 255, 255, 0.05);
+
+            --border: rgba(255, 255, 255, 0.08);
+
+            --text: #e7eefc;
+            --muted: rgba(231, 238, 252, 0.65);
+
+            --accent: #5eead4;
+
+            --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
             color: var(--text);
+
             background:
-                radial-gradient(circle at top left, rgba(79, 209, 197, 0.12), transparent 32%),
-                radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 28%),
-                linear-gradient(180deg, #09101c 0%, #050b15 100%);
+                radial-gradient(circle at 20% 0%, rgba(94, 234, 212, 0.06), transparent 45%),
+                radial-gradient(circle at 80% 10%, rgba(96, 165, 250, 0.05), transparent 50%),
+                var(--bg);
         }
 
+        /* Layout */
         .page {
-            width: min(1180px, calc(100% - 32px));
+            width: min(1080px, calc(100% - 28px));
             margin: 0 auto;
-            padding: 28px 0 48px;
+            padding: 32px 0 64px;
         }
 
+        /* Topbar */
         .topbar {
             display: flex;
             justify-content: space-between;
@@ -45,75 +54,79 @@
             margin-bottom: 18px;
         }
 
+        /* Success alert (soft, not loud green box) */
         .alert-success {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #86efac;
-            padding: 14px 18px;
+            background: rgba(94, 234, 212, 0.08);
+            border: 1px solid rgba(94, 234, 212, 0.18);
+            color: var(--text);
+            padding: 12px 14px;
             border-radius: 12px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            animation: slideDown 0.4s ease;
+            animation: slideDown 0.35s ease;
         }
 
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Brand */
         .brand {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
         }
 
         .brand strong {
-            font-size: 1.1rem;
-            letter-spacing: -0.03em;
+            font-size: 1.05rem;
+            letter-spacing: -0.02em;
         }
 
         .brand span,
-        .muted { color: var(--muted); }
-
-        .action-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        .muted {
+            color: var(--muted);
         }
 
+        /* Buttons */
         .btn,
         .btn-link,
         .btn-danger {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 14px;
-            padding: 12px 16px;
-            font-weight: 700;
+
+            padding: 10px 14px;
+            border-radius: 10px;
+
+            font-weight: 600;
             text-decoration: none;
-            border: 0;
             cursor: pointer;
+
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
         }
 
+        /* primary button = soft accent */
         .btn,
         .btn-link {
-            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-            color: #031018;
+            background: rgba(94, 234, 212, 0.10);
+            border-color: rgba(94, 234, 212, 0.18);
+            color: var(--text);
         }
 
+        .btn:hover,
+        .btn-link:hover {
+            background: rgba(94, 234, 212, 0.16);
+            transform: translateY(-1px);
+        }
+
+        /* danger */
         .btn-danger {
-            background: rgba(251, 113, 133, 0.14);
-            color: #ffdbe1;
-            border: 1px solid rgba(251, 113, 133, 0.28);
+            background: rgba(251, 113, 133, 0.08);
+            border-color: rgba(251, 113, 133, 0.18);
+            color: #ffd6de;
         }
 
-        /* Hide ugly default input */
+        /* File upload hidden input */
         .file-upload input[type="file"] {
             position: absolute;
             left: -9999px;
@@ -122,113 +135,135 @@
         .file-upload {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
-        /* Custom file button */
+        /* File button (cleaner) */
         .file-btn {
-            display: inline-block;
-            padding: 12px 22px;
+            padding: 10px 14px;
+            border-radius: 10px;
 
-            background: linear-gradient(
-                135deg,
-                #2563eb,
-                #3b82f6
-            );
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text);
 
-            color: white;
-            font-weight: 600;
-
-            border-radius: 12px;
             cursor: pointer;
-
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s ease;
         }
 
         .file-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-1px);
         }
 
-        .file-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Selected file name */
         #file-name {
-            display: inline-block;
-            margin-left: 12px;
-            font-size: 14px;
-            color: #2563eb;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            font-size: 13px;
+            color: var(--muted);
         }
 
-        .hero, .panel {
-            border: 1px solid var(--border);
-            border-radius: 28px;
+        /* Panels (core minimal glass) */
+        .hero,
+        .panel,
+        .upload-card,
+        .side-card,
+        .list-card,
+        .quiz-card {
             background: var(--panel);
-            backdrop-filter: blur(12px);
-            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: none;
         }
 
+        /* Hero */
         .hero {
             display: grid;
-            gap: 24px;
-            grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-            padding: 32px;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 22px;
+            padding: 26px;
         }
 
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 14px;
-            border-radius: 999px;
-            border: 1px solid rgba(79, 209, 197, 0.28);
-            background: rgba(79, 209, 197, 0.08);
-            color: #c8fff8;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 0.02em;
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
         }
 
-        h1, h2, p { margin: 0; }
+        /* Typography (more airy) */
+        h1, h2, p {
+            margin: 0;
+        }
 
         h1 {
-            margin-top: 18px;
-            font-size: clamp(2.3rem, 5vw, 4.6rem);
-            line-height: 0.98;
-            letter-spacing: -0.05em;
-            max-width: 12ch;
+            margin-top: 12px;
+            font-size: clamp(2rem, 4vw, 3.6rem);
+            line-height: 1.05;
+            letter-spacing: -0.04em;
         }
 
         .lead {
-            margin-top: 18px;
-            max-width: 62ch;
+            margin-top: 12px;
+            max-width: 60ch;
             color: var(--muted);
-            font-size: 1rem;
-            line-height: 1.75;
+            line-height: 1.7;
         }
 
-        .notice, .error {
-            margin-top: 18px;
-            padding: 14px 16px;
-            border-radius: 18px;
-            border: 1px solid transparent;
+        /* Sections */
+        .section {
+            margin-top: 28px;
         }
 
+        /* Grid */
+        .grid-quiz {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        }
+
+        /* Cards */
+        .quiz-card {
+            padding: 16px;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-2px);
+            background: var(--panel-hover);
+        }
+
+        /* Meta */
+        .quiz-meta {
+            color: var(--muted);
+            font-size: 12.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Inputs */
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        /* Notices */
         .notice {
-            border-color: rgba(52, 211, 153, 0.28);
-            background: rgba(52, 211, 153, 0.1);
-            color: #d9ffef;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(94, 234, 212, 0.08);
+            border: 1px solid rgba(94, 234, 212, 0.15);
         }
 
         .error {
-            border-color: rgba(251, 113, 133, 0.3);
-            background: rgba(251, 113, 133, 0.12);
-            color: #ffe4ea;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(251, 113, 133, 0.08);
+            border: 1px solid rgba(251, 113, 133, 0.15);
         }
 
         .error ul {
@@ -285,14 +320,21 @@
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
         }
 
-        .quiz-card {
+        .quiz-card .action-row {
             display: flex;
-            flex-direction: column;
             gap: 10px;
-            padding: 18px;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.03);
+            align-items: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quiz-card .action-row form {
+            margin: 0;
+        }
+
+        .action-row a,
+        .action-row button {
+            min-height: 50px;
         }
 
         .quiz-meta {
@@ -319,7 +361,7 @@
     <main class="page">
         <header class="topbar">
             <div class="brand">
-                <strong>AI Quiz Generator Dashboard</strong>
+                <strong>AI Quiz Generator</strong>
                 <span>Signed in as {{ auth()->user()->name }}</span>
             </div>
             <div class="action-row">
@@ -337,10 +379,9 @@
 
         <section class="hero">
             <div>
-                <div class="eyebrow">PDF upload for quiz generation</div>
-                <h1>Upload a PDF module and turn it into a 15-question quiz.</h1>
+                <h1>AIQGEN</h1>
                 <p class="lead">
-                    The uploaded PDF is parsed server-side, sent to Groq using llama3-70b-8192, and saved as a quiz with 15 MCQs, answer keys, and explanations.
+                    Upload a PDF module and turn it into a 15-question quiz. The uploaded PDF is parsed server-side, sent to Groq using lllama-3.3-70b-versatile, and saved as a quiz with 15 MCQs, answer keys, and explanations.
                 </p>
 
                 @if ($errors->any())
@@ -387,6 +428,8 @@
             <aside class="side-card">
                 <h2>Flow</h2>
                 <ol>
+                    <li>User uploads a PDF through the form.</li>
+                    <li>Server validates the file, saves it, and shows result.</li>
                     <li>The PDF is stored in storage/app/pdfs.</li>
                     <li>Text is extracted with smalot/pdfparser.</li>
                     <li>Groq returns JSON, then the quiz and 15 questions are stored.</li>
