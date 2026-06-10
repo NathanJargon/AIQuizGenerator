@@ -1,0 +1,50 @@
+AI Quiz Generator - Project Overview
+
+This Laravel application is designed to run locally on Laragon and allow any user to upload a PDF module or textbook chapter.
+
+The uploaded PDF is parsed on the server, then sent to the Groq API using the free-tier model llama3-70b-8192.
+The API generates 15 multiple-choice questions, each with 4 choices, 1 correct answer, and a brief explanation.
+
+Generated quizzes are saved to the database so they can be viewed later or deleted when no longer needed.
+No user authentication is required, so the app is publicly accessible.
+
+System Architecture
+
+1. Frontend
+   - Blade templates only
+   - No separate frontend framework required
+   - Simple forms for PDF upload and quiz management
+
+2. Backend
+   - Laravel latest stable version
+   - Runs locally through Laragon
+   - Controller handles PDF upload and quiz requests
+   - Service class handles communication with the Groq API
+
+3. PDF Parsing
+   - Server-side PDF extraction using smalot/pdfparser
+   - Extracted text is used as the source content for question generation
+
+4. AI Generation
+   - Groq API is called from a Laravel service class
+   - Model: llama3-70b-8192
+   - API key is stored only in the .env file
+
+5. Database
+   - MySQL via Laragon
+   - Migrations are required for quiz and question storage
+   - Quizzes are persisted for later viewing and deletion
+
+6. Security and Configuration
+   - No authentication layer
+   - GROQ_API_KEY must never be committed to source code
+   - Environment-based configuration should be used for local development
+
+Planned Core Flow
+
+1. User uploads a PDF.
+2. Laravel stores and parses the file.
+3. The extracted text is sent to Groq.
+4. Groq returns 15 MCQs with answers and explanations.
+5. The application saves the quiz data in MySQL.
+6. The user can view or delete the generated quiz.
