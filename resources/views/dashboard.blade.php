@@ -355,6 +355,25 @@
             .hero { padding: 20px; }
             .topbar, .section-head { flex-direction: column; align-items: start; }
         }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -404,19 +423,15 @@
                 @csrf
 
                 <div class="file-upload">
-                    <input
-                        id="pdf_file"
-                        type="file"
-                        name="pdf_file"
-                        accept=".pdf"
-                        required
-                    >
+                    <input id="pdf_file" type="file" name="pdf_file" accept=".pdf" required>
 
                     <label for="pdf_file" class="file-btn">
                         📄 Choose PDF
                     </label>
 
                     <span id="file-name">No file selected</span>
+
+                    <div id="loading-spinner" class="spinner hidden"></div>
                 </div>
 
                 <button type="submit" class="btn">
@@ -476,16 +491,23 @@
     document.addEventListener('DOMContentLoaded', function () {
         const input = document.getElementById('pdf_file');
         const fileNameDisplay = document.getElementById('file-name');
+        const spinner = document.getElementById('loading-spinner');
+        const form = document.querySelector('form');
 
-        if (input && fileNameDisplay) {
-            input.addEventListener('change', function () {
-                if (this.files.length) {
-                    fileNameDisplay.textContent = '✓ ' + this.files[0].name;
-                } else {
-                    fileNameDisplay.textContent = 'No file selected';
-                }
-            });
-        }
+        // Show file name
+        input.addEventListener('change', function () {
+            if (this.files.length) {
+                fileNameDisplay.textContent = '✓ ' + this.files[0].name;
+            } else {
+                fileNameDisplay.textContent = 'No file selected';
+            }
+        });
+
+        // Show loading spinner on submit
+        form.addEventListener('submit', function () {
+            spinner.classList.remove('hidden');
+            fileNameDisplay.textContent = 'Processing PDF...';
+        });
     });
     </script>
 </body>
