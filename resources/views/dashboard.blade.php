@@ -371,9 +371,69 @@
             }
         }
 
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        }
+
+        .loader {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 6px solid rgba(255, 255, 255, 0.15);
+            border-top-color: #5eead4;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: rgba(231, 238, 252, 0.8);
+            letter-spacing: 0.5px;
+        }
+
         .hidden {
             display: none;
         }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(20, 30, 50, 0.95);
+            border: 1px solid rgba(94, 234, 212, 0.25);
+            color: #e7eefc;
+            padding: 14px 16px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            z-index: 999999;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .toast.hide {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: 0.3s;
+        }
+
+
     </style>
 </head>
 <body>
@@ -390,11 +450,6 @@
                 </form>
             </div>
         </header>
-
-        @if (session('success'))
-            <div class="notice">{{ session('success') }}</div>
-        @endif
-
 
         <section class="hero">
             <div>
@@ -413,13 +468,7 @@
                     </div>
                 @endif
 
-                @if(session('success'))
-                    <div class="alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-            <form action="{{ route('pdf-uploads.store') }}" method="POST" enctype="multipart/form-data" class="upload-card">
+                <form id="upload-form" action="{{ route('pdf-uploads.store') }}" method="POST" enctype="multipart/form-data" class="upload-card">
                 @csrf
 
                 <div class="file-upload">
@@ -487,28 +536,53 @@
             </div>
         </section>
     </main>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const input = document.getElementById('pdf_file');
-        const fileNameDisplay = document.getElementById('file-name');
-        const spinner = document.getElementById('loading-spinner');
-        const form = document.querySelector('form');
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('pdf_file');
+    const fileNameDisplay = document.getElementById('file-name');
+    const spinner = document.getElementById('loading-spinner');
+    const form = document.getElementById('upload-form');
+    const overlay = document.getElementById('loading-overlay');
+    const toast = document.getElementById('toast');
 
-        // Show file name
-        input.addEventListener('change', function () {
-            if (this.files.length) {
-                fileNameDisplay.textContent = '✓ ' + this.files[0].name;
-            } else {
-                fileNameDisplay.textContent = 'No file selected';
-            }
-        });
+    @if(session('success'))
+        toast.textContent = @json(session('success'));
+        toast.classList.remove('hidden');
 
-        // Show loading spinner on submit
-        form.addEventListener('submit', function () {
-            spinner.classList.remove('hidden');
-            fileNameDisplay.textContent = 'Processing PDF...';
-        });
+        setTimeout(() => {
+            toast.classList.add('hide');
+        }, 500);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3200);
+    @endif
+
+    input.addEventListener('change', function () {
+        if (this.files.length) {
+            fileNameDisplay.textContent = '✓ ' + this.files[0].name;
+        } else {
+            fileNameDisplay.textContent = 'No file selected';
+        }
     });
-    </script>
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        overlay.classList.remove('hidden');
+        spinner.classList.remove('hidden');
+        fileNameDisplay.textContent = 'Processing PDF...';
+
+        setTimeout(() => {
+            form.submit();
+        }, 2500);
+    });
+});
+</script>
+    <div id="toast" class="toast hidden"></div>
+    <div id="loading-overlay" class="overlay hidden">
+    <div class="loader"></div>
+    <p class="loading-text">Generating your quiz...</p>
+</div>
 </body>
 </html>
