@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login</title>
+    <title>Register</title>
+
     <style>
         :root {
             color-scheme: dark;
@@ -13,16 +14,19 @@
             --muted: #9fb2d0;
             --accent: #4fd1c5;
         }
+
         * { box-sizing: border-box; }
+
         body {
             margin: 0;
             min-height: 100vh;
             display: grid;
             place-items: center;
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: Inter, ui-sans-serif, system-ui;
             color: var(--text);
             background: linear-gradient(180deg, #09101c 0%, #050b15 100%);
         }
+
         .card {
             width: min(420px, calc(100% - 24px));
             padding: 28px;
@@ -31,9 +35,16 @@
             background: var(--panel);
             box-shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
         }
+
         h1 { margin: 0 0 8px; }
         p { margin: 0 0 18px; color: var(--muted); }
-        label { display: block; margin: 14px 0 8px; font-weight: 700; }
+
+        label {
+            display: block;
+            margin: 14px 0 8px;
+            font-weight: 700;
+        }
+
         input {
             width: 100%;
             padding: 14px;
@@ -42,6 +53,7 @@
             background: #050b15;
             color: var(--text);
         }
+
         button {
             width: 100%;
             margin-top: 18px;
@@ -53,6 +65,7 @@
             font-weight: 800;
             cursor: pointer;
         }
+
         .error {
             margin-top: 14px;
             color: #ffdbe1;
@@ -61,30 +74,50 @@
             border-radius: 14px;
             padding: 12px 14px;
         }
-        .hint { margin-top: 14px; font-size: 13px; color: var(--muted); }
+
+        .hint {
+            margin-top: 14px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
-    <form class="card" method="POST" action="{{ route('login.store') }}">
+
+    <form class="card" method="POST" action="{{ route('register.store') }}">
         @csrf
-        <h1>Sign in</h1>
-        <p>Use your local account to manage generated quizzes.</p>
+
+        <h1>Create account</h1>
+        <p>Register to start generating AI-powered quizzes.</p>
+
+        <label for="name">Name</label>
+        <input id="name" type="text" name="name" value="{{ old('name') }}" required>
 
         <label for="email">Email</label>
-        <input id="email" type="email" name="email" value="{{ old('email', 'test@example.com') }}" required>
+        <input id="email" type="email" name="email" value="{{ old('email') }}" required>
 
         <label for="password">Password</label>
-        <input id="password" type="password" name="password" value="password" required>
+        <input id="password" type="password" name="password" required>
+
+        <label for="password_confirmation">Confirm Password</label>
+        <input id="password_confirmation" type="password" name="password_confirmation" required>
 
         @if ($errors->any())
             <div class="error">{{ $errors->first() }}</div>
         @endif
 
-        <button type="submit">Login</button>
+        <button type="submit">Register</button>
+
         <div class="hint">
-            Don’t have an account?
-            <a href="{{ route('register') }}">Register here</a>
+            Already have an account?
+            <a href="{{ route('login') }}">Login here</a>
         </div>
     </form>
+
 </body>
 </html>
