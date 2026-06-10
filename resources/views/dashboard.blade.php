@@ -418,7 +418,7 @@
             padding: 14px 16px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            z-index: 999999;
+            z-index: 1000000;
             animation: fadeInUp 0.3s ease;
         }
 
@@ -543,20 +543,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const spinner = document.getElementById('loading-spinner');
     const form = document.getElementById('upload-form');
     const overlay = document.getElementById('loading-overlay');
-    const toast = document.getElementById('toast');
-
-    @if(session('success'))
-        toast.textContent = @json(session('success'));
-        toast.classList.remove('hidden');
-
-        setTimeout(() => {
-            toast.classList.add('hide');
-        }, 500);
-
-        setTimeout(() => {
-            toast.remove();
-        }, 3200);
-    @endif
 
     input.addEventListener('change', function () {
         if (this.files.length) {
@@ -567,16 +553,48 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     form.addEventListener('submit', function (e) {
-        e.preventDefault();
+        const file = input.files[0];
 
+        if (!file) {
+            e.preventDefault();
+            showToast("Empty file. Please add a PDF.");
+            return;
+        }
+
+        e.preventDefault();
         overlay.classList.remove('hidden');
         spinner.classList.remove('hidden');
-        fileNameDisplay.textContent = 'Processing PDF...';
 
         setTimeout(() => {
             form.submit();
-        }, 2500);
+        }, 1200);
     });
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        toast.classList.remove('hide');
+
+        toast.style.opacity = "1";
+        toast.style.transform = "translateY(0)";
+
+        clearTimeout(window.toastHideTimeout);
+        clearTimeout(window.toastRemoveTimeout);
+
+        window.toastHideTimeout = setTimeout(() => {
+            toast.classList.add('hide');
+        }, 2000);
+
+        window.toastRemoveTimeout = setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 2600);
+    }
+
+    @if(session('success'))
+        showToast(@json(session('success')));
+    @endif
 });
 </script>
     <div id="toast" class="toast hidden"></div>

@@ -8,8 +8,8 @@
     <style>
         :root {
             color-scheme: dark;
-            --panel: rgba(10, 19, 34, 0.9);
-            --border: rgba(148, 163, 184, 0.14);
+            --panel: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
             --text: #e5eefc;
             --muted: #9fb2d0;
             --accent: #4fd1c5;
